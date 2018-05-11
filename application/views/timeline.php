@@ -150,15 +150,33 @@ body {
     left: 0%;
   }
   .black-ribbon {  position: fixed;  z-index: 9999;  width: 70px;}@media only all and (min-width: 768px) {  .black-ribbon {    width: auto;  }}.stick-left { left: 0; }.stick-right { right: 0; }.stick-top { top: 0; }.stick-bottom { bottom: 0; }
+  .selecttimeline{
+    background-color: white;
+    padding: 10px;
+    color:white;
+
+  }
 }
 </style>
 </head>
 <body>
 
 <?php require("template/menu.php") ?>
+<div style="border-radius: 6px;padding: 20px;background-color: white;position: fixed;top: 160px ;left: 0;">
+<li id="timeline-dropdown" class="dropdown"><a class="dropdown-toggle " data-toggle="dropdown" href="#">timeline<span class="caret"></span></a>
+        <ul id="timeline-dropdown-list" class="dropdown-menu">
+          <li onclick="switchtimeline(1)"><a href="#">Page 1-1</a></li>
+          <li><a href="#">Page 1-2</a></li>
+          <li><a href="#">Page 1-3</a></li>
+        </ul>
+      </li>
+</div>
+<div style="border-radius: 6px;padding: 20px;background-color: white;position: fixed;top: 60px ;left: 0;">
+  <li id="createtimeline" onclick="createtimeline()"><a>createtimeline</a></li>
+</div>
 <div id="inner">
   <div id="mytimeline" class="mytimeline">
-    <h1 style="color: white">Plese select your timeline .</h1>
+    <h1 style="margin-left: 100px;color: white">Plese select your timeline .</h1>
   </div> 
 </div>
 <div class="" style="border-radius: 6px;padding: 20px;background-color: white;position: fixed;bottom: 0 ;left: 0;">
@@ -167,6 +185,7 @@ article : <input id=article type="text"><br>
 time : <input id=date type="date"><br>
 <button onclick="addtext()">add text<button>
 </div>
+<br/><br/><br/><br/><br/>
 <script>
 
   // This is called with the results from from FB.getLoginStatus().
@@ -258,6 +277,7 @@ time : <input id=date type="date"><br>
   }
   function createtimeline(){
     let timeline_name = window.prompt("name timeline.", "Name");
+    if(timeline_name !=null){
     FB.api('/me?fields=id,name', function(response) {
       let datax = {
         timeline_name: timeline_name,
@@ -281,6 +301,7 @@ time : <input id=date type="date"><br>
             }
         });
     });
+    }
    
   }
   let timeline_id = ""
@@ -288,6 +309,10 @@ time : <input id=date type="date"><br>
     timeline_id = id 
     $.get(`https://localhost:8082/timeline/${id}/text`, function(data, status){
       let html=""
+      if(data.length == 0){
+        let html = "<h1 style='margin-left:100px;color:white'>No text</h1>"
+        $('#mytimeline').html(html)
+      }else{
         for(let i =0 ;i<data.length;i++){
           
           if(i%2==0){
@@ -300,19 +325,21 @@ time : <input id=date type="date"><br>
       <div class="mycontent">
         <h2>${data[i].text_title}</h2>
         <p>${data[i].text_article}</p>
+        <p>${data[i].text_date}</p>
       </div>
     </div>`
           
         }
         $('#mytimeline').html(html)
+      }
     });
     
   }
   function addtext(){
     let datax = {
       text_title: $("#title").val(),
-      text_article: $("#article").val()
-      test_date: $('#date').val()
+      text_article: $("#article").val(),
+      text_date: $('#date').val()
     }
     console.log(timeline_id)
     $.ajax({
